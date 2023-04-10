@@ -521,16 +521,11 @@ final class PhabricatorEnv extends Phobject {
   }
 
   public static function getAnyBaseURI() {
-    $allowed_uris = self::getEnvConfig('phabricator.allowed-uris');
-    $base_uri = self::getRequestBaseURI();
-
-    foreach ($allowed_uris as $allowed_uri) {
-      if (rtrim($base_uri, "/") == rtrim($allowed_uri, "/")) {
-        return $base_uri;
-      }
-    }
-
     $base_uri = self::getEnvConfig('phabricator.base-uri');
+
+    if (!$base_uri) {
+      $base_uri = self::getRequestBaseURI();
+    }
 
     if (!$base_uri) {
       throw new Exception(
