@@ -197,6 +197,11 @@ final class PHUIObjectItemView extends AphrontTagView {
     return $this;
   }
 
+  public function setAttachURI($attach_uri){
+    $this->attach_uri = $attach_uri;
+    return $this;
+  }
+
   public function addAction(PHUIListItemView $action) {
     if (count($this->actions) >= 3) {
       throw new Exception(pht('Limit 3 actions per item.'));
@@ -667,6 +672,21 @@ final class PHUIObjectItemView extends AphrontTagView {
           'href' => $image_href,
         ),
         $image);
+    }
+
+    $attach_button = null;
+    if ($this->attach_uri) {
+      $attach_button = id(new PHUIButtonView())
+        ->setHref($this->attach_uri)
+        ->setTag('a')
+        ->setWorkflow(true)
+        ->setColor(PHUIButtonView::GREY)
+        ->setSize(PHUIButtonView::SMALL)
+        ->setText(pht('Attach File'));
+    }
+
+    if ($attach_button) {
+      $this->setSideColumn($attach_button);
     }
 
     /* Build a fake table */
