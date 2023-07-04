@@ -37,6 +37,8 @@ final class PHUIObjectItemView extends AphrontTagView {
   private $isSelected;
   private $isForbidden;
 
+  private $attach_uri;
+
   public function setDisabled($disabled) {
     $this->disabled = $disabled;
     return $this;
