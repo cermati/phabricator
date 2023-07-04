@@ -44,7 +44,7 @@ final class PhabricatorFileUICurtainListController
       $file = $attachment->getFile();
       $attach_button = null;
 
-      if (!$attachment->isPolicyAttachment()) {
+      if ($file && !$attachment->isPolicyAttachment()) {
         $file_policies = PhabricatorPolicyQuery::loadPolicies(
           $viewer,
           $file);
