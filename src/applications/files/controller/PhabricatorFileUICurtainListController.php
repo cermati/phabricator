@@ -10,7 +10,13 @@ final class PhabricatorFileUICurtainListController
   public function handleRequest(AphrontRequest $request) {
     $viewer = $request->getViewer();
 
+    var_dump("Viewer Object");
+    var_dump($viewer);
+
     $object_phid = $request->getURIData('phid');
+
+    var_dump("Object_phid");
+    var_dump($object_phid);
 
     $object = id(new PhabricatorObjectQuery())
       ->setViewer($viewer)
@@ -19,6 +25,9 @@ final class PhabricatorFileUICurtainListController
     if (!$object) {
       return new Aphront404Response();
     }
+
+    var_dump("Object");
+    var_dump($object);
 
     $view_capability = PhabricatorPolicyCapability::CAN_VIEW;
     $object_policies = PhabricatorPolicyQuery::loadPolicies(
