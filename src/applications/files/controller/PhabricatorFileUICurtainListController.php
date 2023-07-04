@@ -42,8 +42,7 @@ final class PhabricatorFileUICurtainListController
       ->setUser($viewer);
     foreach ($attachments as $attachment) {
       $file = $attachment->getFile();
-
-      $attach_uri = null;
+      $attach_button = null;
 
       if (!$attachment->isPolicyAttachment()) {
         $file_policies = PhabricatorPolicyQuery::loadPolicies(
@@ -60,6 +59,14 @@ final class PhabricatorFileUICurtainListController
             '/file/ui/curtain/attach/%s/%s/',
             $object->getPHID(),
             $file->getPHID());
+
+          $attach_button = id(new PHUIButtonView())
+            ->setHref($attach_uri)
+            ->setTag('a')
+            ->setWorkflow(true)
+            ->setColor(PHUIButtonView::GREY)
+            ->setSize(PHUIButtonView::SMALL)
+            ->setText(pht('Attach File'));
         }
       }
       $file_phid = $attachment->getFilePHID();
@@ -69,7 +76,7 @@ final class PhabricatorFileUICurtainListController
         ->setHeader($handle->getFullName())
         ->setHref($handle->getURI())
         ->setDisabled($handle->isDisabled())
-        ->setAttachURI($attach_uri);
+        ->setSideColumn($attach_button);
 
       if ($handle->getImageURI()) {
         $item->setImageURI($handle->getImageURI());

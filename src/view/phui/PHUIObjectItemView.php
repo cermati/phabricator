@@ -37,8 +37,6 @@ final class PHUIObjectItemView extends AphrontTagView {
   private $isSelected;
   private $isForbidden;
 
-  private $attach_uri;
-
   public function setDisabled($disabled) {
     $this->disabled = $disabled;
     return $this;
@@ -196,11 +194,6 @@ final class PHUIObjectItemView extends AphrontTagView {
   public function setEpoch($epoch) {
     $date = phabricator_dual_datetime($epoch, $this->getUser());
     $this->addIcon('none', $date);
-    return $this;
-  }
-
-  public function setAttachURI($attach_uri){
-    $this->attach_uri = $attach_uri;
     return $this;
   }
 
@@ -674,21 +667,6 @@ final class PHUIObjectItemView extends AphrontTagView {
           'href' => $image_href,
         ),
         $image);
-    }
-
-    $attach_button = null;
-    if ($this->attach_uri) {
-      $attach_button = id(new PHUIButtonView())
-        ->setHref($this->attach_uri)
-        ->setTag('a')
-        ->setWorkflow(true)
-        ->setColor(PHUIButtonView::GREY)
-        ->setSize(PHUIButtonView::SMALL)
-        ->setText(pht('Attach File'));
-    }
-
-    if ($attach_button) {
-      $this->setSideColumn($attach_button);
     }
 
     /* Build a fake table */
