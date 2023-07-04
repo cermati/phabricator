@@ -10,13 +10,7 @@ final class PhabricatorFileUICurtainListController
   public function handleRequest(AphrontRequest $request) {
     $viewer = $request->getViewer();
 
-    var_dump("Viewer Object");
-    var_dump($viewer);
-
     $object_phid = $request->getURIData('phid');
-
-    var_dump("Object_phid");
-    var_dump($object_phid);
 
     $object = id(new PhabricatorObjectQuery())
       ->setViewer($viewer)
@@ -25,9 +19,6 @@ final class PhabricatorFileUICurtainListController
     if (!$object) {
       return new Aphront404Response();
     }
-
-    var_dump("Object");
-    var_dump($object);
 
     $view_capability = PhabricatorPolicyCapability::CAN_VIEW;
     $object_policies = PhabricatorPolicyQuery::loadPolicies(
@@ -50,10 +41,10 @@ final class PhabricatorFileUICurtainListController
     $list = id(new PHUIObjectItemListView())
       ->setUser($viewer);
     foreach ($attachments as $attachment) {
-      $file = $attachment->getFile();
       $attach_button = null;
 
       if (!$attachment->isPolicyAttachment()) {
+        $file = $attachment->getFile();
         $file_policies = PhabricatorPolicyQuery::loadPolicies(
           $viewer,
           $file);
