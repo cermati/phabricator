@@ -41,10 +41,10 @@ final class PhabricatorFileUICurtainListController
     $list = id(new PHUIObjectItemListView())
       ->setUser($viewer);
     foreach ($attachments as $attachment) {
+      $file = $attachment->getFile();
       $attach_button = null;
 
-      if (!$attachment->isPolicyAttachment()) {
-        $file = $attachment->getFile();
+      if ($file && !$attachment->isPolicyAttachment()) {
         $file_policies = PhabricatorPolicyQuery::loadPolicies(
           $viewer,
           $file);
