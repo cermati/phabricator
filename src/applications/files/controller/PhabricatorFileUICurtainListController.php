@@ -20,6 +20,12 @@ final class PhabricatorFileUICurtainListController
       return new Aphront404Response();
     }
 
+    $view_capability = PhabricatorPolicyCapability::CAN_VIEW;
+    $object_policies = PhabricatorPolicyQuery::loadPolicies(
+      $viewer,
+      $object);
+    $object_policy = idx($object_policies, $view_capability);
+
     $attachments = id(new PhabricatorFileAttachmentQuery())
       ->setViewer($viewer)
       ->withObjectPHIDs(array($object->getPHID()))
@@ -35,13 +41,42 @@ final class PhabricatorFileUICurtainListController
     $list = id(new PHUIObjectItemListView())
       ->setUser($viewer);
     foreach ($attachments as $attachment) {
+      $file = $attachment->getFile();
+      $attach_button = null;
+
+      if ($file && !$attachment->isPolicyAttachment()) {
+        $file_policies = PhabricatorPolicyQuery::loadPolicies(
+          $viewer,
+          $file);
+        $file_policy = idx($file_policies, $view_capability);
+
+        if ($object_policy->isStrongerThanOrEqualTo($file_policy)) {
+          // The file is not attached to the object, but the file policy
+          // allows anyone who can see the object to see the file too, so
+          // there is no material problem with the file not being attached.
+        } else {
+          $attach_uri = urisprintf(
+            '/file/ui/curtain/attach/%s/%s/',
+            $object->getPHID(),
+            $file->getPHID());
+
+          $attach_button = id(new PHUIButtonView())
+            ->setHref($attach_uri)
+            ->setTag('a')
+            ->setWorkflow(true)
+            ->setColor(PHUIButtonView::GREY)
+            ->setSize(PHUIButtonView::SMALL)
+            ->setText(pht('Attach File'));
+        }
+      }
       $file_phid = $attachment->getFilePHID();
       $handle = $file_handles[$file_phid];
 
       $item = id(new PHUIObjectItemView())
         ->setHeader($handle->getFullName())
         ->setHref($handle->getURI())
-        ->setDisabled($handle->isDisabled());
+        ->setDisabled($handle->isDisabled())
+        ->setSideColumn($attach_button);
 
       if ($handle->getImageURI()) {
         $item->setImageURI($handle->getImageURI());
