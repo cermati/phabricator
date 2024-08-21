@@ -142,6 +142,45 @@ final class ProjectBoardTaskCard extends Phobject {
       }
     }
 
+    # Reference: https://p.cermati.com/T7572
+    $field_list = PhabricatorCustomField::getObjectFields($task,PhabricatorCustomField::ROLE_VIEW);
+
+    $field_list
+      ->setViewer($viewer)
+      ->readFieldsFromStorage($task);
+
+    $fields = $field_list->getFields();
+
+    foreach ($fields as $field_key => $field) {
+      $proxy = $field->getProxy();
+
+      if (is_null($proxy)) {
+        continue;
+      }
+
+      if (!$proxy->getFieldConfigValue('show_in_board')) {
+        continue;
+      }
+
+      $value = $field->renderPropertyViewValue([]);
+
+      if (is_null($value) || strlen($value) == 0) {
+        continue;
+      }
+
+      $icon = $proxy->getFieldConfigValue('icon');
+
+      $custom_tag = id(new PHUITagView())
+        ->setType(PHUITagView::TYPE_SHADE)
+        ->setColor(PHUITagView::COLOR_GREY)
+        ->setSlimShady(true)
+        ->setIcon($icon)
+        ->setName($value)
+        ->addClass('phui-workcard-points');
+
+      $card->addAttribute($custom_tag);
+    }
+
     $subtype = $task->newSubtypeObject();
     if ($subtype && $subtype->hasTagView()) {
       $subtype_tag = $subtype->newTagView()
