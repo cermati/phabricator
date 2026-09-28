@@ -940,10 +940,14 @@ final class PhabricatorPolicyFilter extends Phobject {
 
     // This may be more involved later, but for now being able to see the
     // space is equivalent to being able to see everything in it.
-    return self::hasCapability(
-      $viewer,
-      $space,
-      PhabricatorPolicyCapability::CAN_VIEW);
+
+    // NOTE: This is called once per object per capability. Use the
+    // request-cached list of spaces the viewer can see instead of building
+    // a new filter for each call: a space with a custom policy otherwise
+    // costs several queries per object (e.g., tens of thousands of queries
+    // on a large workboard).
+    $viewer_spaces = PhabricatorSpacesNamespaceQuery::getViewerSpaces($viewer);
+    return isset($viewer_spaces[$space->getPHID()]);
   }
 
   private function rejectObjectFromSpace(
