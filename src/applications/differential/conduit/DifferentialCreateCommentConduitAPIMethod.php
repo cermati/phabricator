@@ -94,9 +94,6 @@ final class DifferentialCreateCommentConduitAPIMethod
             ->setContent($content));
     }
 
-    // NOTE: The legacy "attach_inlines" flag is now ignored and has no
-    // effect. See T13513.
-
     // NOTE: The legacy "silent" flag is now ignored and has no effect. See
     // T13042.
 
@@ -105,6 +102,17 @@ final class DifferentialCreateCommentConduitAPIMethod
       ->setContentSource($request->newContentSource())
       ->setContinueOnNoEffect(true)
       ->setContinueOnMissingFields(true);
+
+    // Publish the viewer's inline drafts, same as the "Submit" button.
+    if ($request->getValue('attach_inlines')) {
+      $inline_xactions = $editor->newAutomaticInlineTransactions(
+        $revision,
+        DifferentialTransaction::TYPE_INLINE,
+        new DifferentialDiffInlineCommentQuery());
+      foreach ($inline_xactions as $inline_xaction) {
+        $xactions[] = $inline_xaction;
+      }
+    }
 
     $editor->applyTransactions($revision, $xactions);
 
